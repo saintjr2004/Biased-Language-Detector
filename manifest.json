@@ -11,6 +11,14 @@
 			"128": "icon.jpg"
 		}
 	},
+	"content_scripts": [{
+		"matches": [
+			"https://www.bbc.com/news/*",
+			"https://www.bbc.com/*/article/*",
+			"https://www.bbc.com/*/articles/*"
+		],
+		"js": ["placeholders/bbc_parser.js"]
+	}],
 	"icons": {
 		"16": "icon.jpg",
 		"48": "icon.jpg",
