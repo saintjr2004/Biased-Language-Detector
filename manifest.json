@@ -2,27 +2,24 @@
 	"manifest_version": 3,
 	"name": "Biased Language Detector",
 	"version": "1.0",
-	"description": "Detects biased/opinionated language in news articles.",
+	"description": "Detects bias in certain news articles.",
 	"action": {
 		"default_popup": "popup.html",
-		"default_icon": {
-			"16": "icon.jpg",
-			"48": "icon.jpg",
-			"128": "icon.jpg"
+		"default_icon": "icon.jpg"
+	},
+	"permissions": [
+		"activeTab",
+		"scripting",
+		"tabs"
+	],
+	"host_permissions": [
+		"https://www.bbc.com/*",
+		"https://www.bbc.co.uk/*"
+	],
+	"web_accessible_resources": [
+		{
+			"resources": ["parsers/bbc_parser.js","popup.js"],
+			"matches": ["<all_urls>"]
 		}
-	},
-	"content_scripts": [{
-		"matches": [
-			"https://www.bbc.com/news/*",
-			"https://www.bbc.com/*/article/*",
-			"https://www.bbc.com/*/articles/*"
-		],
-		"js": ["placeholders/bbc_parser.js"]
-	}],
-	"icons": {
-		"16": "icon.jpg",
-		"48": "icon.jpg",
-		"128": "icon.jpg"
-	},
-	"permissions": []
+	]
 }

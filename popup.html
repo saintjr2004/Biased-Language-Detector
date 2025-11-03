@@ -1,23 +1,41 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Hello World</title>
-		<style>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Biased Language Detector</title>
+	<style>
 		body {
-			font-family: Arial, sans-serif;
-			text-align: center;
-			padding: 20px;
-			width: 200px;
+			font-family: sans-serif;
+			width: 350px;
+			padding: 10px;
+			background: #fafafa;
+			color: #222;
 		}
-		button {
-			margin-top: 10px;
-			padding: 5px 10px;
+		h1 {
+			font-size: 16px;
+			margin-bottom: 10px;
 		}
-		</style>
-	</head>
-	<body>
-		<h2>Hello, World!</h2>
-		<button id="helloBtn">Hello World</button>
-		<script src="popup.js"></script>
-	</body>
+		#status {
+			font-style: italic;
+			margin-bottom: 8px;
+		}
+		#output {
+			white-space: pre-wrap;
+			background: #fff;
+			border: 1px solid #ccc;
+			padding: 8px;
+			border-radius: 4px;
+			max-height: 400px;
+			overflow-y: auto;
+		}
+	</style>
+</head>
+<body>
+	<h1>Biased Language Detector</h1>
+	<div id="status">Loading...</div>
+	<div id="output"></div>
+
+	<script src="popup.js"></script>
+</body>
 </html>
