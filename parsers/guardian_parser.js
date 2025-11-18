@@ -18,7 +18,39 @@
  * @returns {object|null} An object with metadata or null if not found.
  */
 function parseMetadata() {
-  // TODO
+  const metadataScript = document.querySelector('script[type="application/ld+json"]');
+
+  if (!metadataScript) {
+    console.error("Could not find the JSON-LD metadata script.");
+    return null;
+  }
+
+  try {
+    // The Guardian's JSON-LD is an array. First element contains the article data.
+    const metadataArray = JSON.parse(metadataScript.textContent);
+
+    if (!Array.isArray(metadataArray) || metadataArray.length === 0) {
+      console.error("JSON-LD metadata is not an array or is empty.");
+      return null;
+    }
+
+    const metadata = metadataArray[0];
+
+    // The description is not contained in the first element.
+    const descriptionTag = document.querySelector('meta[name="description"]');
+
+    return {
+      title: metadata.headline || "Title not found",
+      author:
+        metadata.author && metadata.author[0] ? metadata.author[0].name : "Author not found",
+      description: descriptionTag ? descriptionTag.content : "Description not found",
+      datePublished: metadata.datePublished || "Date not found",
+      dateModified: metadata.dateModified || "Date modified not found",
+    };
+  } catch (error) {
+    console.error("Failed to parse JSON-LD metadata:", error);
+    return null;
+  }
 }
 
 function parseArticleContent() {
