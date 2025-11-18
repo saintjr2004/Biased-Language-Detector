@@ -14,11 +14,12 @@
 	],
 	"host_permissions": [
 		"https://www.bbc.com/*",
-		"https://www.bbc.co.uk/*"
+		"https://www.bbc.co.uk/*",
+		"https://www.theguardian.com/*/*/*/*/*"
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["parsers/bbc_parser.js","popup.js"],
+			"resources": ["parsers/bbc_parser.js","parsers/guardian_parser.js","popup.js"],
 			"matches": ["<all_urls>"]
 		}
 	]
