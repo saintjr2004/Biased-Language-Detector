@@ -9,12 +9,11 @@
 const status = document.getElementById('status');
 const output = document.getElementById('output');
 
-/**
+/*
  * Main logic executed once Chrome identifies the active tab.
- * Queries the current active tab, verifies it's a BBC News article,
+ * Queries the current active tab, verifies it's a valid news article.
  * injects script to extract HTML, loads custom parser, extracts paragraphs.
  *
- * @callback chrome.tabs.query
  * @param {object[]} tabs - Array of active tabs returned by Chrome
  */
 chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
@@ -25,14 +24,30 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 	}
 
 	const url = tab.url; // Store page URL
-
-	// Validate that the tab is a BBC News article URL using regex
-	if (!/bbc\.(co\.uk|com)\/news\//i.test(url)) {
-		status.textContent = 'This is not a BBC News article.'; // User feedback
-		return; // Stop if page is not a BBC news article
+	
+	let site = 'null';
+	
+	if (url.includes("bbc.co.uk") || url.includes("bbc.com")) {
+		site = 'bbc';
+	} else if (url.includes("nbc.com") || url.includes("nbcnews.com")) {
+		site = 'nbc';
+	} else if (url.includes("cbsnews.com")) {
+		site = 'cbs';
+	} else if (url.includes("foxnews.com") || url.includes("fox.com")) {
+		site = 'fox';
+	} else if (url.includes("cnn.com")) {
+		site = 'cnn';
+	} else if (url.includes("theguardian.com")) {
+		site = 'guardian';
+	}
+	
+	// Validate that the tab is a valid news article URL using regex
+	if (site === 'null') {
+		status.textContent = 'This is not a valid article.'; // User feedback
+		return; // Stop if page is not a valid news article
 	}
 
-	status.textContent = 'Parsing article...'; // Notify user of parsing
+	status.textContent = 'Parsing article...';
 
 	try {
 		/**
@@ -56,10 +71,10 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 		doc.write(html);
 		doc.close();
 
-		// Create <script> tag
+		// Load scripts
 		const script = doc.createElement('script');
-		script.src = chrome.runtime.getURL('parsers/bbc_parser.js');
-
+		script.src = chrome.runtime.getURL('parsers/' + site + '_parser.js');
+		
 		// --- script.onload ---
 		/**
 		 * Executes when parser script has loaded inside iframe.
@@ -67,12 +82,23 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 		 */
 		script.onload = () => {
 			try {
-				// Try multiple known parser entry points for compatibility
-				const parserFunc =
-					doc.defaultView.parseArticleContent ||
-					doc.defaultView.parseBBCArticle ||
-					doc.defaultView.parseMetadata;
-
+				// Parse text based on article type
+				let parserFunc;
+				
+				if (site === 'bbc') {
+					parserFunc = doc.defaultView.parseBBCArticle;
+				} else if (site === 'nbc') {
+					parserFunc = doc.defaultView.parseNBCArticle;
+				} else if (site === 'cnn') {
+					parserFunc = doc.defaultView.parseCNNArticle;
+				} else if (site === 'cbs') {
+					parserFunc = doc.defaultView.parseCBSArticle;
+				} else if (site === 'fox') {
+					parserFunc = doc.defaultView.parseFoxArticle;
+				} else if (site === 'guardian') {
+					parserFunc = doc.defaultView.parseGuardianArticle;
+				}
+				
 				let paragraphs = [];
 
 				// If parser function exists, call it
@@ -92,8 +118,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 					}
 				}
 
+				// Backup parser that just extracts all paragraph elements, in case specialized parser does not work
 				if (paragraphs.length === 0) {
-					console.warn('[BBC Parser] Falling back to raw paragraph scraping.');
+					console.warn('[Parser] Falling back to raw paragraph scraping.');
 
 					// Try to detect primary article container elements
 					const article = doc.querySelector(
@@ -107,20 +134,17 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 							.filter(Boolean);
 					}
 				}
-
-				// Display results to user
-				status.textContent = ''
-				output.textContent =
-					paragraphs.length > 0
-						? paragraphs.join('\n\n')
-						: '(No article text found)';
-
-			} catch (err) {
-				console.error('[BBC Parser] Runtime error:', err);
-				status.textContent = 'Error parsing article.'; // Error UI message
+				
+				// Display bias results to user
+				status.textContent = 'Analyzing...';
+				analyzeBias(paragraphs);
+				
+			} catch (error) {
+				console.error('[Parser] Runtime error:', error);
+				status.textContent = 'Error parsing article.';
 			}
 		};
-
+		
 		// Append parser script to iframe once body exists
 		if (doc.body) {
 			doc.body.appendChild(script);
@@ -134,9 +158,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 			);
 		}
 
-	} catch (e) {
+	} catch (error) {
 		// Catch any script execution failures
-		console.error('[BBC Parser] Execution error:', e);
+		console.error('[Parser] Execution error:', error);
 		status.textContent = 'Execution error.';
 	}
 });
