@@ -68,7 +68,9 @@ Rules:
 - ALWAYS include an entry for every paragraph you receive.
 - Use "none" when no bias type clearly applies.
 - Keep "reason" short (1-2 sentences).
-- DO NOT detect bias from quoted statements. Just detect bias from what the article says.
+- DO NOT detect bias from quoted statements. Just detect bias from what the writer of the article says.
+If you detect bias from a statement like '"This is very bad," said John Doe.' Then the results will not
+be accurate. 
 """
 
 	userPayload = {
@@ -150,4 +152,5 @@ def analyzeBias(paragraphs: List[str]) -> List[Dict[str, Any]]:
 			"label": r["label"],
 			"reason": r["reason"],
 		})
+
 	return merged
