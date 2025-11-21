@@ -12,8 +12,10 @@ from pydantic import BaseModel
 from typing import List
 from analyze_bias import analyzeBias
 
+# Create fastAPI instance
 app = FastAPI()
 
+# Validate user data
 class AnalyzeRequest(BaseModel):
 	paragraphs: List[str]
 
@@ -33,4 +35,5 @@ async def analyzeBiasEndpoint(req: AnalyzeRequest):
 # Render stuff   
 @app.get("/")
 def root():
+
 	return {"status": "OK", "message": "FastAPI is running on Render"}
