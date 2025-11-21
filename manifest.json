@@ -5,7 +5,7 @@
 	"description": "Detects bias in certain news articles.",
 	"action": {
 		"default_popup": "popup.html",
-		"default_icon": "icon.jpg"
+		"default_icon": "icon.png"
 	},
 	"permissions": [
 		"activeTab",

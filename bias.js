@@ -20,8 +20,8 @@ async function analyzeBias(paragraphs) {
 		});
 
 		if (!response.ok) {
-			console.error("Server error:", response.status, response.statusText);
-			throw new Error("[Analysis] Bias analysis failed");
+			console.error("[Analysis] Server Error:", response.status, response.statusText);
+			throw new Error("Bias analysis failed.");
 		}
 
 		// annotations: [{ index, text, label, reason }, ...]
@@ -29,7 +29,6 @@ async function analyzeBias(paragraphs) {
 		renderBiasResults(annotations);
 	} catch (error) {
 		console.error(error);
-		status.textContent = '';
 		output.textContent = "Failed to reach bias analysis.";
 	}
 }
@@ -44,7 +43,6 @@ function renderBiasResults(annotations) {
 	const container = document.getElementById("output");
 	container.innerHTML = "";
 
-	status.textContent = ''
 	if (!annotations.length) {
 		container.textContent = "No obvious bias detected.";
 		return;

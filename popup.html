@@ -5,37 +5,58 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>UnBiased.</title>
 	<style>
+		/* Scroll Bar */
+		::-webkit-scrollbar {
+			width: 7px;
+		}
+		::-webkit-scrollbar-track {
+			background: #05070a; 
+		}
+		::-webkit-scrollbar-thumb {
+			background: #1b2436; 
+		}
+		::-webkit-scrollbar-thumb:hover {
+			background: #161d2b; 
+		}
+		
+		/* Text/Background */
 		body {
-			font-family: sans-serif;
+			font-family: Georgia, serif;
 			width: 350px;
 			padding: 10px;
-			background: #fafafa;
-			color: #222;
+			background: #04173d;
+			color: #fafafa;
 		}
-		h1 {
-			font-size: 16px;
+		#header {
+			font-size: 25px;
 			margin-bottom: 10px;
-		}
-		#status {
-			font-style: italic;
-			margin-bottom: 8px;
+			color: #fafafa;
+			text-align: center;
 		}
 		#output {
 			white-space: pre-wrap;
-			background: #fff;
-			border: 1px solid #ccc;
+			background: #020e24;
+			border: 2px solid #000;
 			padding: 8px;
 			border-radius: 4px;
 			max-height: 400px;
 			overflow-y: auto;
+			text-align: center;
+			margin-bottom: 10px;
+		}
+		#url {
+			font-size: 10px;
+			margin-bottom: 5px;
+			color: #bbb;
+			text-align: center;
 		}
 	</style>
 </head>
 <body>
-	<h1>UnBiased.</h1>
-	<div id="status">Loading...</div>
-	<div id="output"></div>
-
+	<div id="header">UnBiased.</div>
+	<div id="output">Loading...</div>
+	<div id="url">No website loaded.</div>
+	
 	<script src="popup.js"></script>
 	<script src="bias.js"></script>
 </body>

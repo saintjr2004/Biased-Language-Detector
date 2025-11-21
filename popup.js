@@ -5,9 +5,9 @@
  * @date 10/30/2025
  *
  */
- 
-const status = document.getElementById('status');
+
 const output = document.getElementById('output');
+const urlText = document.getElementById('url');
 
 /*
  * Main logic executed once Chrome identifies the active tab.
@@ -19,14 +19,18 @@ const output = document.getElementById('output');
 chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 	const tab = tabs[0];
 	if (!tab || !tab.url) {
-		status.textContent = 'No active tab detected.'; // Update UI message
+		output.textContent = 'No active tab detected.'; // Update UI message
 		return; // Stop execution if no tab or missing URL
 	}
 
 	const url = tab.url; // Store page URL
+	const parsedUrl = new URL(url);
+	
+	urlText.textContent = parsedUrl.origin;
 	
 	let site = 'null';
 	
+	// Validate that the tab is a valid news article URL using regex
 	if (url.includes("bbc.co.uk") || url.includes("bbc.com")) {
 		site = 'bbc';
 	} else if (url.includes("nbc.com") || url.includes("nbcnews.com")) {
@@ -41,13 +45,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 		site = 'guardian';
 	}
 	
-	// Validate that the tab is a valid news article URL using regex
 	if (site === 'null') {
-		status.textContent = 'This is not a valid article.'; // User feedback
-		return; // Stop if page is not a valid news article
+		output.textContent = 'This is not a valid article.';
+		return;
 	}
 
-	status.textContent = 'Parsing article...';
+	output.textContent = 'Parsing article...';
 
 	try {
 		/**
@@ -136,12 +139,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 				}
 				
 				// Display bias results to user
-				status.textContent = 'Analyzing...';
+				output.textContent = 'Analyzing...';
 				analyzeBias(paragraphs);
 				
 			} catch (error) {
 				console.error('[Parser] Runtime error:', error);
-				status.textContent = 'Error parsing article.';
+				output.textContent = 'Error parsing article.';
 			}
 		};
 		
@@ -161,6 +164,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
 	} catch (error) {
 		// Catch any script execution failures
 		console.error('[Parser] Execution error:', error);
-		status.textContent = 'Execution error.';
+		output.textContent = 'Execution error.';
 	}
 });
