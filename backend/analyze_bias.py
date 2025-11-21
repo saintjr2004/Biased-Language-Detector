@@ -36,7 +36,7 @@ You MUST output valid JSON only, no explanation text.
 Given a list of paragraphs, you will detect these labels:
 
 - "none": no notable bias
-- "personal opinion": expresses a subjective personal view or feeling
+- "personal opinion": expresses a subjective personal view or feeling. note that this is specifically from the writer of the article and NOT from directly quoted statements, which tend to have biased language. 
 - "ad hominem": attacks a person or group instead of addressing the argument
 - "hasty generalization": uses sweeping or absolute generalizations from limited evidence
 - "strawman": argues against an oversimplified or otherwise distorted view of the information
@@ -68,11 +68,10 @@ Rules:
 - ALWAYS include an entry for every paragraph you receive.
 - Use "none" when no bias type clearly applies.
 - Keep "reason" short (1-2 sentences).
-- DO NOT detect bias from quoted statements. Just detect bias from what the writer of the article says.
-If you detect bias from a statement like '"This is very bad," said John Doe.' Then the results will not
-be accurate. 
+- DO NOT detect bias from quoted statements. Just detect bias from what the writer of the article says. If you detect bias from a statement like '"This is very bad," said John Doe.' Then the results will not be accurate. 
 """
 
+	# Set up JSON table from paragraphs list
 	userPayload = {
 		"paragraphs": [
 			{"index": item["index"], "text": item["text"]}
@@ -80,6 +79,7 @@ be accurate.
 		]
 	}
 
+	# Push JSON data into the userPayload table from the LLM response.
 	response = client.responses.create(
 		model="gpt-4.1-mini",
 		input=[
@@ -96,9 +96,10 @@ be accurate.
 		max_output_tokens=2147483648,
 	)
 
+	# Fetch LLM response text
 	outputText = response.output[0].content[0].text
-	# print(outputText)
 
+	# Load JSON data from response
 	try:
 		parsed = json.loads(outputText)
 	except json.JSONDecodeError as e:
@@ -154,3 +155,4 @@ def analyzeBias(paragraphs: List[str]) -> List[Dict[str, Any]]:
 		})
 
 	return merged
+
