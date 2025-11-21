@@ -32,8 +32,9 @@ may be needed for context
 async def analyzeBiasEndpoint(req: AnalyzeRequest):
 	return analyzeBias(req.paragraphs)
    
-# Render stuff   
+# Expose Render stuff   
 @app.get("/")
 def root():
 
 	return {"status": "OK", "message": "FastAPI is running on Render"}
+
