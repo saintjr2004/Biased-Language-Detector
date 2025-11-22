@@ -64,9 +64,7 @@ function parseArticleContent() {
   const articleContainer = document.querySelector("div#maincontent");
 
   if (!articleContainer) {
-    console.error(
-      'Could not find the main content container <div id="maincontent">.',
-    );
+    console.error('Could not find the main content container <div id="maincontent">.');
     return [];
   }
 

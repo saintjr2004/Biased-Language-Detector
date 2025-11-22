@@ -68,12 +68,63 @@ function parseMetadata() {
  *
  * @returns {object[]} An array of content objects (e.g., subheading, paragraph).
  */
-function parseArticleContent() { return null; }
+function parseArticleContent() {
+  const articleContainer = document.querySelector("article#article-0 section");
+
+  if (!articleContainer) {
+    console.error("Could not find the main content container <section>.");
+    return [];
+  }
+
+  const content = []; // Array of elements
+  const elements = Array.from(articleContainer.children); // Use children to avoid footer info
+
+  elements.forEach((element) => {
+    // Subheadings
+    if (element.tagName === "H2") {
+      content.push({
+        type: "subheading",
+        text: element.textContent.trim(),
+      });
+    }
+
+    // Paragraphs
+    else if (element.tagName === "P") {
+      const text = element.textContent.trim();
+
+      // Ignore paragraphs that are just bold text holders or empty
+      if (text && element.querySelector("b") === null) {
+        content.push({
+          type: "paragraph",
+          text: text,
+        });
+      }
+    }
+
+    // Images and their captions
+    else if (element.tagName === "FIGURE") {
+      const img = element.querySelector("img");
+      const caption = element.querySelector("figcaption");
+      if (img) {
+        content.push({
+          type: "image",
+          src: img.src,
+          caption: caption ? caption.textContent.trim() : "",
+        });
+      }
+    }
+  });
+
+  return content;
+}
 
 // --------------------------------------------------------------
 // ------------------------Main Execution------------------------
 // --------------------------------------------------------------
 
+/**
+ * Temporary formatting function for testing, and POC.
+ */
 function parseCBSArticle() {
     const summaryInfo = parseMetadata();
     const articleContent = parseArticleContent();
