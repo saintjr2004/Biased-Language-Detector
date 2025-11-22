@@ -1,49 +1,57 @@
 /**
- * This is the parser for The Guardian.
+ * This is the parser for the Columbia Broadcasting System (CBS).
  *
  * This parser uses extracts metadata and structured
- * content from a Guardian news article.
+ * content from a CBS news article.
  *
  * @author Shane Ruegg
- * @date 11/17/2025
+ * @date 11/21/2025
  *
  */
 
-
 /**
  * Parses the page's embedded JSON-LD metadata script. Which contains
- * the title, author, and description, which is typically not found
- * within the HTML <article> block.
+ * the title, author, and description.
+ *
+ * It loops through all JSON-LD scripts to find the one with
+ * "@type": "NewsArticle", as CBS includes multiple JSON-LD scripts.
  *
  * @returns {object|null} An object with metadata or null if not found.
  */
 function parseMetadata() {
-  const metadataScript = document.querySelector('script[type="application/ld+json"]');
+  const metadataScripts = document.querySelectorAll(
+    'script[type="application/ld+json"]',
+  );
 
-  if (!metadataScript) {
-    console.error("Could not find the JSON-LD metadata script.");
+  if (!metadataScripts || metadataScripts.length === 0) {
+    console.error("Could not find any JSON-LD metadata scripts.");
     return null;
   }
 
+  let metadata = null;
   try {
-    // The Guardian's JSON-LD is an array. First element contains the article data.
-    const metadataArray = JSON.parse(metadataScript.textContent);
+    // Loop through all script tags to find the "NewsArticle"
+    for (const script of metadataScripts) {
+      const data = JSON.parse(script.textContent);
 
-    if (!Array.isArray(metadataArray) || metadataArray.length === 0) {
-      console.error("JSON-LD metadata is not an array or is empty.");
-      return null;
+      if (data && data["@type"] === "NewsArticle") {
+        metadata = data;
+        break;
+      }
     }
 
-    const metadata = metadataArray[0];
-
-    // The description is not contained in the first element.
-    const descriptionTag = document.querySelector('meta[name="description"]');
+    if (metadata === null) {
+      console.error("Could not find the 'NewsArticle' JSON-LD metadata.");
+      return null;
+    }
 
     return {
       title: metadata.headline || "Title not found",
       author:
-        metadata.author && metadata.author[0] ? metadata.author[0].name : "Author not found",
-      description: descriptionTag ? descriptionTag.content : "Description not found",
+        metadata.author && metadata.author[0]
+          ? metadata.author[0].name
+          : "Author not found",
+      description: metadata.description || "Description not found",
       datePublished: metadata.datePublished || "Date not found",
       dateModified: metadata.dateModified || "Date modified not found",
     };
@@ -61,18 +69,17 @@ function parseMetadata() {
  * @returns {object[]} An array of content objects (e.g., subheading, paragraph).
  */
 function parseArticleContent() {
-  const articleContainer = document.querySelector("div#maincontent");
+  const articleContainer = document.querySelector("article#article-0 section");
 
   if (!articleContainer) {
-    console.error('Could not find the main content container <div id="maincontent">.');
+    console.error("Could not find the main content container <section>.");
     return [];
   }
 
   const content = []; // Array of elements
-  const elements = articleContainer.querySelectorAll("h2, p, figure"); // Most common elements in a Guardian Article
+  const elements = Array.from(articleContainer.children); // Use children to avoid footer info
 
   elements.forEach((element) => {
-
     // Subheadings
     if (element.tagName === "H2") {
       content.push({
@@ -118,7 +125,7 @@ function parseArticleContent() {
 /**
  * Temporary formatting function for testing, and POC.
  */
-function parseGuardianArticle() {
+function parseCBSArticle() {
     const summaryInfo = parseMetadata();
     const articleContent = parseArticleContent();
 
@@ -140,4 +147,4 @@ function parseGuardianArticle() {
     }
 }
 
-parseGuardianArticle()
+parseCBSArticle()
